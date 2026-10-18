@@ -1,0 +1,7 @@
+node_modules/
+.agents/
+.vscode/mcp.json
+.aider-desk/
+.env
+.env.*
+!.env.example

@@ -1,0 +1,24 @@
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "leetcode-cron",
+    "main": "src/index.js",
+    "compatibility_date": "2025-07-25",
+    "observability": {
+        "enabled": true
+    },
+    "triggers": {
+        "crons": [
+            "0 * * * *"
+        ]
+    },
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "leetcode-cron",
+            "database_id": "e1c4261f-c35f-474d-a241-8be969428bc7"
+        }
+    ],
+    "vars": {
+        "JUDGE0_API_URL": "https://judge0-ce.p.rapidapi.com"
+    }
+}
