@@ -164,7 +164,7 @@ const Blog1 = () => {
                     Romeiro Fernandes
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    Technical Director, CodeStorm CRCE
+                    Ex Codestorm Tech lead CRCE
                   </div>
                 </div>
               </div>

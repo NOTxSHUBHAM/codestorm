@@ -113,11 +113,11 @@ export default function HeroSection() {
             <motion.button
               whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => navigate("/leaderboard")}
+              onClick={() => navigate("/round-1")}
               className="group relative w-60 overflow-hidden rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-3 font-semibold text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-300"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
-                View Leaderboard
+                View Quiz
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   →
                 </span>

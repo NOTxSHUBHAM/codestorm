@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import WORKER_URL from "@/lib/worker";
 import {
   Dialog,
   DialogContent,
@@ -82,8 +83,6 @@ const UserAdding = () => {
   const [updatingUsers, setUpdatingUsers] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-
-  const WORKER_URL = import.meta.env.VITE_WORKER_URL;
 
   useEffect(() => {
     const token = localStorage.getItem("userAdminToken");

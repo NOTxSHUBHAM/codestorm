@@ -24,6 +24,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import AddUserModal from "@/components/ui/AddUserModal";
+import WORKER_URL from "@/lib/worker";
 import {
   TrendingUp,
   ExternalLink,
@@ -67,6 +68,7 @@ const Leaderboard = () => {
   const navigate = useNavigate();
   const [leaderboardData, setLeaderboardData] = useState(null);
   const [filteredData, setFilteredData] = useState(null);
+  const [loadError, setLoadError] = useState("");
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("total");
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,8 +78,6 @@ const Leaderboard = () => {
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedBranch, setSelectedBranch] = useState("");
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
-
-  const WORKER_URL = import.meta.env.VITE_WORKER_URL;
 
   const sortOptions = [
     { value: "total", label: "Total Problems", icon: Target },
@@ -104,6 +104,7 @@ const Leaderboard = () => {
   const fetchLeaderboard = async () => {
     try {
       setLoading(true);
+      setLoadError("");
 
       // If we're filtering, fetch all data; otherwise paginate on server
       const shouldFetchAll = selectedYear || selectedBranch || searchQuery;
@@ -126,6 +127,10 @@ const Leaderboard = () => {
       }
     } catch (error) {
       console.error("Error fetching leaderboard:", error);
+      setLoadError(
+        "Unable to reach the leaderboard service. Check the worker URL and confirm the Cloudflare Worker is deployed."
+      );
+      setLeaderboardData([]);
       toast.error("Failed to load leaderboard data");
     } finally {
       setLoading(false);
@@ -610,12 +615,27 @@ const handleAddUser = async ({ username, branch }) => {
               >
                 <div>
                   <p className="text-muted-foreground text-base sm:text-lg mb-4">
-                    {searchQuery
+                    {loadError
+                      ? loadError
+                      : searchQuery
                       ? `No users found matching "${searchQuery}"`
                       : "No users found in the leaderboard"}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {searchQuery ? "Try a different search term!" : ""}
+                    {loadError ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={fetchLeaderboard}
+                        disabled={loading}
+                      >
+                        Retry
+                      </Button>
+                    ) : searchQuery ? (
+                      "Try a different search term!"
+                    ) : (
+                      ""
+                    )}
                   </p>
                 </div>
               </motion.div>

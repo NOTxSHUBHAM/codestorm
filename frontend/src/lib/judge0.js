@@ -1,7 +1,7 @@
 // This file will be updated to call the Cloudflare Worker endpoints
 // For now, keeping a placeholder that will hit the worker
 
-const WORKER_URL = import.meta.env.VITE_WORKER_URL || 'https://leetcode-cron.romeirofernandes.workers.dev';
+import WORKER_URL from "./worker";
 
 const LANGUAGE_IDS = {
   'c': 50,
