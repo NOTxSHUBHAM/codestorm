@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
@@ -167,7 +166,7 @@ function SocialLink({ href, label, icon }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-center gap-2 px-4 py-2 rounded-full border border-border/60 bg-background/60 hover:border-primary/50 hover:bg-primary/10 text-sm font-medium transition-all"
+      className="group flex items-center gap-2 px-4 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/30 text-white text-sm font-medium transition-all duration-300"
     >
       <span className="text-primary transition-transform group-hover:scale-110">
         {icon}

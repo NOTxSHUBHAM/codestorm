@@ -1,469 +1,334 @@
-import React, { useEffect, useRef } from 'react';
-import { useTabSwitch } from '../lib/useTabSwitch';
-import { useRateLimit } from '../lib/rateLimit';
-import { useContest } from '../hooks/useContest';
-import { useTimers } from '../hooks/useTimers';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { useCodeSubmission } from '../hooks/useCodeSubmission';
-import { FaGripVertical, FaClock } from 'react-icons/fa';
-import { toast } from 'sonner';
-import ContestHeader from '../components/contest/ContestHeader';
-import ProblemSidebar from '../components/contest/ProblemSidebar';
-import ProblemStatement from '../components/contest/ProblemStatement';
-import CodeEditor from '../components/contest/CodeEditor';
-import OutputPanel from '../components/contest/OutputPanel';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2,
+  XCircle,
+  Send,
+} from "lucide-react";
+import { toast } from "sonner";
+import { quizQuestions as questionBank } from "../data/quizQuestions";
+import { Button } from "@/components/ui/button";
 
-const Contest = () => {
-  const contestState = useContest();
-  const {
-    selectedBranch,
-    setSelectedBranch,
-    problems,
-    currentProblem,
-    setCurrentProblem,
-    code,
-    setCode,
-    language,
-    setLanguage,
-    solvedProblems,
-    contestEnded,
-    timeLeft,
-    setTimeLeft,
-    startTime,
-    setStartTime,
-    submissions,
-    problemTimers,
-    setProblemTimers,
-    problemStartTimes,
-    setProblemStartTimes,
-    tabSwitchWarningIssued,
-    setTabSwitchWarningIssued,
-    tabSwitchCountRef,
-    lastHideTimestampRef,
-    isSE,
-    formatTime,
-    formatProblemTime,
-    getCurrentProblemTime,
-    loadProblems,
-    initializeResults,
-    endContest,
-    getBoilerplateCode,
-    navigate,
-    CONTEST_DURATION
-  } = contestState;
+const QUIZ_DURATION = 10 * 60; // 10 minutes
 
-  const timerHooks = useTimers({
-    problemStartTimes,
-    setProblemStartTimes,
-    problemTimers,
-    setProblemTimers,
-    currentProblem,
-    contestEnded
-  });
+const getRandomQuestions = (bank, count) => {
+  const shuffled = [...bank];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, count);
+};
 
-  const { startProblemTimer, stopProblemTimer, updateProblemTimer } = timerHooks;
+const Round1Contest = () => {
+  const navigate = useNavigate();
+  const [questions] = useState(() => getRandomQuestions(questionBank, 10));
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [timeLeft, setTimeLeft] = useState(QUIZ_DURATION);
+  const [showResult, setShowResult] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const selectedBranch = localStorage.getItem("selectedBranch");
 
-  const storageHooks = useLocalStorage(selectedBranch, getCurrentProblemTime, problemStartTimes);
-  const { 
-    saveCodeToLocalStorage, 
-    loadCodeFromLocalStorage, 
-    loadTimersFromLocalStorage,
-    saveCurrentProblem,
-    loadCurrentProblem
-  } = storageHooks;
+  useEffect(() => {
+    if (!selectedBranch) {
+      toast.error("All the best!");
+      navigate("/round-1/branch-selection");
+    }
+  }, [selectedBranch, navigate]);
 
-  const submissionHooks = useCodeSubmission({
-    ...contestState,
-    problemTimers
-  });
-
-  const { isSubmitting, output, submitSolution, setOutput } = submissionHooks;
-  const { canExecute, recordAttempt } = useRateLimit(5, 60000);
-
-  // Resizer states
-  const [leftWidth, setLeftWidth] = React.useState(40);
-  const [topHeight, setTopHeight] = React.useState(70);
-  const containerRef = useRef(null);
-  const isResizingHorizontal = useRef(false);
-  const isResizingVertical = useRef(false);
-  const hasLoadedInitialCode = useRef(false);
-  const isInitialLoad = useRef(true); // **NEW: Track initial load**
-
-  // Tab switch detection
-  useTabSwitch(() => {
-    if (contestEnded) return;
-    if (!document.hidden) return;
-
-    const now = Date.now();
-    if (now - lastHideTimestampRef.current < 300) return;
-    lastHideTimestampRef.current = now;
-
-    tabSwitchCountRef.current += 1;
-
-    if (tabSwitchCountRef.current === 1) {
-      if (!tabSwitchWarningIssued) {
-        setTabSwitchWarningIssued(true);
-        toast.warning('Tab switch detected. Warning: Next switch will end the contest.');
-      }
+  useEffect(() => {
+    if (isSubmitted) return;
+    if (timeLeft <= 0) {
+      handleSubmit(true);
       return;
     }
-
-    if (tabSwitchCountRef.current >= 2) {
-      toast.error('Second tab switch detected. Contest ended.');
-      endContest();
-    }
-  });
-
-  // Resize handlers
-  const handleMouseDownHorizontal = (e) => {
-    e.preventDefault();
-    isResizingHorizontal.current = true;
-    document.addEventListener('mousemove', handleMouseMoveHorizontal);
-    document.addEventListener('mouseup', handleMouseUpHorizontal);
-  };
-
-  const handleMouseMoveHorizontal = (e) => {
-    if (!isResizingHorizontal.current || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const newLeftWidth = ((e.clientX - rect.left) / rect.width) * 100;
-    if (newLeftWidth > 20 && newLeftWidth < 70) {
-      setLeftWidth(newLeftWidth);
-    }
-  };
-
-  const handleMouseUpHorizontal = () => {
-    isResizingHorizontal.current = false;
-    document.removeEventListener('mousemove', handleMouseMoveHorizontal);
-    document.removeEventListener('mouseup', handleMouseUpHorizontal);
-  };
-
-  const handleMouseDownVertical = (e) => {
-    e.preventDefault();
-    isResizingVertical.current = true;
-    document.addEventListener('mousemove', handleMouseMoveVertical);
-    document.addEventListener('mouseup', handleMouseUpVertical);
-  };
-
-  const handleMouseMoveVertical = (e) => {
-    if (!isResizingVertical.current || !containerRef.current) return;
-    const rightPanel = containerRef.current.querySelector('.right-panel');
-    if (!rightPanel) return;
-    const rect = rightPanel.getBoundingClientRect();
-    const newTopHeight = ((e.clientY - rect.top) / rect.height) * 100;
-    if (newTopHeight > 40 && newTopHeight < 85) {
-      setTopHeight(newTopHeight);
-    }
-  };
-
-  const handleMouseUpVertical = () => {
-    isResizingVertical.current = false;
-    document.removeEventListener('mousemove', handleMouseMoveVertical);
-    document.removeEventListener('mouseup', handleMouseUpVertical);
-  };
-
-  const switchToProblem = (problemIndex) => {
-    if (problemIndex === currentProblem) return;
-    
-    saveCodeToLocalStorage(currentProblem, code, language);
-    updateProblemTimer(currentProblem);
-    stopProblemTimer(currentProblem);
-    
-    setCurrentProblem(problemIndex);
-    saveCurrentProblem(problemIndex);
-    startProblemTimer(problemIndex);
-    
-    setTimeout(() => {
-      // Priority 1: localStorage
-      const savedCode = loadCodeFromLocalStorage(problemIndex);
-      if (savedCode && savedCode.code.trim()) {
-        setCode(savedCode.code);
-        setLanguage(savedCode.language);
-        console.log(`✅ Loaded localStorage code for problem ${problemIndex}`);
-        return;
-      }
-      
-      // Priority 2: Firebase (solved)
-      if (submissions[problemIndex] && submissions[problemIndex].solvedAt) {
-        setCode(submissions[problemIndex].code || '');
-        setLanguage(submissions[problemIndex].language || 'cpp');
-        console.log(`✅ Loaded solved code from Firebase for problem ${problemIndex}`);
-        return;
-      }
-      
-      // Priority 3: Boilerplate
-      if (problems[problemIndex]) {
-        setCode(getBoilerplateCode(problemIndex, language));
-        console.log(`✅ Loaded boilerplate for problem ${problemIndex}`);
-      }
-    }, 50);
-  };
-
-  // **UPDATED: Auto-save with immediate timer persistence**
-  useEffect(() => {
-    if (!code || !selectedBranch || solvedProblems.has(currentProblem)) return;
-    
-    const timeoutId = setTimeout(() => {
-      saveCodeToLocalStorage(currentProblem, code, language);
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [code, language, selectedBranch, currentProblem]);
-
-  // **UPDATED: Code restoration - only when currentProblem changes**
-  useEffect(() => {
-    if (problems.length > 0 && selectedBranch && !isInitialLoad.current) {
-      // Priority 1: localStorage
-      const savedCode = loadCodeFromLocalStorage(currentProblem);
-      if (savedCode && savedCode.code.trim()) {
-        setCode(savedCode.code);
-        setLanguage(savedCode.language);
-        console.log(`✅ Restored localStorage code for problem ${currentProblem}`);
-        return;
-      }
-      
-      // Priority 2: Firebase (solved)
-      if (submissions[currentProblem] && submissions[currentProblem].solvedAt) {
-        const solvedCode = submissions[currentProblem].code || '';
-        setCode(solvedCode);
-        setLanguage(submissions[currentProblem].language || 'cpp');
-        console.log(`✅ Restored solved code from Firebase for problem ${currentProblem}`);
-        return;
-      }
-      
-      // Priority 3: Boilerplate
-      const boilerplate = getBoilerplateCode(currentProblem, language);
-      if (boilerplate) {
-        setCode(boilerplate);
-        console.log(`✅ Loaded boilerplate for problem ${currentProblem}`);
-      }
-    }
-  }, [currentProblem, problems, selectedBranch]); // Only when currentProblem changes
-
-  // **UPDATED: Main timer with periodic saves**
-  useEffect(() => {
-    if (!startTime || contestEnded) return;
-
-    const timer = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const remaining = Math.max(0, CONTEST_DURATION - elapsed);
-      setTimeLeft(remaining);
-
-      if (elapsed % 5000 < 1000) {
-        saveCodeToLocalStorage(currentProblem, code, language);
-      }
-
-      if (remaining <= 0) {
-        endContest();
-      }
-    }, 1000);
-
+    const timer = setInterval(() => setTimeLeft((t) => t - 1), 1000);
     return () => clearInterval(timer);
-  }, [startTime, contestEnded, currentProblem, code, language]);
+  }, [timeLeft, isSubmitted]);
 
-  // **UPDATED: Initialize with current problem restoration**
-  useEffect(() => {
-    const branch = localStorage.getItem('selectedBranch');
-    if (!branch) {
-      navigate('/round-1/branch-selection');
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  };
+
+  const handleAnswer = (optionIndex) => {
+    if (isSubmitted) return;
+    setAnswers({ ...answers, [currentIndex]: optionIndex });
+  };
+
+  const handleSubmit = (auto = false) => {
+    if (!auto && Object.keys(answers).length < questions.length) {
+      toast.error(
+        `Please answer all questions. ${
+          questions.length - Object.keys(answers).length
+        } remaining.`
+      );
       return;
     }
-    
-    setSelectedBranch(branch);
-    
-    initializeResults(branch).then(() => {
-      if (!startTime && !localStorage.getItem(`contest_started_${branch}`)) {
-        const newStartTime = Date.now();
-        setStartTime(newStartTime);
-        localStorage.setItem(`contest_started_${branch}`, newStartTime.toString());
-      } else if (!startTime) {
-        const savedStartTime = localStorage.getItem(`contest_started_${branch}`);
-        if (savedStartTime) {
-          setStartTime(parseInt(savedStartTime));
-        }
-      }
+    setIsSubmitted(true);
+    setShowResult(true);
+    if (auto) toast.warning("Time up! Auto-submitting...");
+  };
+
+  const calculateScore = () => {
+    let score = 0;
+    questions.forEach((q, idx) => {
+      if (answers[idx] === q.correctAnswer) score++;
     });
-  }, [navigate]);
+    return score;
+  };
 
-  // **FIXED: Load timers, code, and restore current problem properly**
-  useEffect(() => {
-    if (selectedBranch && problems.length > 0 && isInitialLoad.current) {
-      isInitialLoad.current = false; // Mark that initial load is done
-      
-      // Step 1: Restore current problem from localStorage
-      const savedProblem = loadCurrentProblem();
-      if (savedProblem !== 0 && savedProblem < problems.length) {
-        setCurrentProblem(savedProblem);
-        console.log(`✅ Restored current problem: ${savedProblem}`);
-      }
-      
-      // Step 2: Load timers from localStorage
-      loadTimersFromLocalStorage(problems, setProblemTimers, setProblemStartTimes, savedProblem || 0);
-      
-      // Step 3: Start timer for the restored problem
-      startProblemTimer(savedProblem || 0);
-      
-      // Step 4: Load code AFTER currentProblem is set
-      setTimeout(() => {
-        const problemToLoad = savedProblem || 0;
-        
-        // Priority 1: localStorage
-        const savedCode = loadCodeFromLocalStorage(problemToLoad);
-        if (savedCode && savedCode.code.trim()) {
-          setCode(savedCode.code);
-          setLanguage(savedCode.language);
-          hasLoadedInitialCode.current = true;
-          console.log(`✅ Loaded localStorage code on init for problem ${problemToLoad}`);
-          return;
-        }
-        
-        // Priority 2: Firebase (solved)
-        if (submissions[problemToLoad] && submissions[problemToLoad].solvedAt) {
-          setCode(submissions[problemToLoad].code || '');
-          setLanguage(submissions[problemToLoad].language || 'cpp');
-          hasLoadedInitialCode.current = true;
-          console.log(`✅ Loaded solved code on init for problem ${problemToLoad}`);
-          return;
-        }
-        
-        // Priority 3: Boilerplate - **FIXED: Use problemToLoad, not currentProblem**
-        const boilerplate = getBoilerplateCode(problemToLoad, language);
-        if (boilerplate) {
-          setCode(boilerplate);
-          hasLoadedInitialCode.current = true;
-          console.log(`✅ Loaded boilerplate on init for problem ${problemToLoad}`);
-        }
-      }, 300); // Increased timeout to ensure state updates
-    }
-  }, [selectedBranch, problems]);
+  const currentQuestion = questions[currentIndex];
+  const progress = ((currentIndex + 1) / questions.length) * 100;
+  const answeredCount = Object.keys(answers).length;
 
-  // **NEW: Handle language change - load appropriate boilerplate/saved code**
-  useEffect(() => {
-    if (problems.length === 0 || !selectedBranch || solvedProblems.has(currentProblem)) return;
-    
-    // Priority 1: localStorage for this language
-    const savedCode = loadCodeFromLocalStorage(currentProblem);
-    if (savedCode && savedCode.language === language && savedCode.code.trim()) {
-      setCode(savedCode.code);
-      console.log(`✅ Loaded localStorage code for language ${language}`);
-      return;
-    }
-    
-    // Priority 2: Firebase (solved) - keep the solved code regardless of language
-    if (submissions[currentProblem] && submissions[currentProblem].solvedAt) {
-      // Don't change code if problem is solved
-      return;
-    }
-    
-    // Priority 3: Boilerplate for the new language
-    const boilerplate = getBoilerplateCode(currentProblem, language);
-    if (boilerplate) {
-      setCode(boilerplate);
-      console.log(`✅ Loaded boilerplate for language ${language}`);
-    }
-  }, [language, currentProblem, problems, selectedBranch]); // Watch language changes
+  if (showResult) {
+    const score = calculateScore();
+    const percentage = (score / questions.length) * 100;
 
-  useEffect(() => {
-    if (selectedBranch) {
-      loadProblems();
-    }
-  }, [selectedBranch]);
-
-  if (contestEnded) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-destructive mb-4">Contest Ended</h2>
-          <p className="text-muted-foreground">Redirecting to home...</p>
+      <div className="min-h-screen bg-[#0a0505] text-white p-4 py-12">
+        <div className="max-w-3xl mx-auto space-y-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center space-y-4"
+          >
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-orange-500 to-orange-700 mb-4 shadow-[0_0_40px_-10px_rgba(249,115,22,0.5)]">
+              {percentage >= 60 ? (
+                <CheckCircle2 className="h-12 w-12 text-white" />
+              ) : (
+                <XCircle className="h-12 w-12 text-white" />
+              )}
+            </div>
+            <h1 className="text-4xl font-bold">Quiz Complete!</h1>
+            <div className="text-6xl font-bold text-orange-500">
+              {score}/{questions.length}
+            </div>
+            <p className="text-xl text-gray-300">
+              {percentage >= 80
+                ? "Excellent work! 🎉"
+                : percentage >= 60
+                ? "Good job! 👍"
+                : "Keep practicing! 💪"}
+            </p>
+          </motion.div>
+
+          <div className="space-y-3">
+            <h2 className="text-xl font-semibold text-white mb-4">Answer Review</h2>
+            {questions.map((q, idx) => {
+              const userAnswer = answers[idx];
+              const isCorrect = userAnswer === q.correctAnswer;
+              const skipped = userAnswer === undefined;
+
+              return (
+                <motion.div
+                  key={q.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  className={`p-4 rounded-xl border ${
+                    isCorrect
+                      ? "bg-green-500/10 border-green-500/30"
+                      : skipped
+                      ? "bg-gray-500/10 border-gray-500/30"
+                      : "bg-red-500/10 border-red-500/30"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5">
+                      {isCorrect ? (
+                        <CheckCircle2 className="h-5 w-5 text-green-400" />
+                      ) : skipped ? (
+                        <Clock className="h-5 w-5 text-gray-400" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-400" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-white mb-2">
+                        {idx + 1}. {q.question}
+                      </p>
+                      <div className="space-y-1 text-sm">
+                        {!skipped && (
+                          <p className={isCorrect ? "text-green-300" : "text-red-300"}>
+                            Your answer: {q.options[userAnswer]}
+                          </p>
+                        )}
+                        {skipped && <p className="text-gray-400">Not answered</p>}
+                        {!isCorrect && (
+                          <p className="text-green-300">
+                            Correct: {q.options[q.correctAnswer]}
+                          </p>
+                        )}
+                        <p className="text-gray-500 italic mt-2">{q.explanation}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          <Button
+            onClick={() => navigate("/")}
+            className="w-full h-12 bg-gradient-to-r from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white rounded-xl"
+          >
+            Back to Home
+          </Button>
         </div>
       </div>
     );
   }
-
-  if (!problems.length) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <FaClock className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading problems...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const currentProblemData = problems[currentProblem];
-  const isProblemSolved = solvedProblems.has(currentProblem);
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <ContestHeader
-        selectedBranch={selectedBranch}
-        solvedCount={solvedProblems.size}
-        totalProblems={problems.length}
-        timeLeft={timeLeft}
-        formatTime={formatTime}
-        onEndContest={endContest}
-      />
-
-      <div className="flex-1 flex w-full">
-        <ProblemSidebar
-          problems={problems}
-          currentProblem={currentProblem}
-          solvedProblems={solvedProblems}
-          switchToProblem={switchToProblem}
-          formatProblemTime={formatProblemTime}
-          getCurrentProblemTime={getCurrentProblemTime}
-          isSE={isSE}
-        />
-
-        <div className="flex-1 flex w-full" ref={containerRef}>
-          <div 
-            className="overflow-y-auto bg-background border-r border-border"
-            style={{ width: `${leftWidth}%` }}
-          >
-            <ProblemStatement problem={currentProblemData} isSE={isSE} />
+    <div className="min-h-screen bg-[#0a0505] text-white p-4">
+      <div className="max-w-3xl mx-auto py-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold"> Quiz</h1>
           </div>
-
-          <div 
-            className="w-1 bg-border hover:bg-primary cursor-col-resize flex items-center justify-center group"
-            onMouseDown={handleMouseDownHorizontal}
+          <div
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-lg ${
+              timeLeft < 60
+                ? "bg-red-500/20 text-red-300 animate-pulse border border-red-500/30"
+                : "bg-[#1a1313] text-white border border-gray-800"
+            }`}
           >
-            <FaGripVertical className="text-muted-foreground group-hover:text-primary" size={12} />
+            <Clock className="h-4 w-4" />
+            {formatTime(timeLeft)}
           </div>
+        </div>
 
-          <div 
-            className="flex flex-col bg-card right-panel"
-            style={{ width: `${100 - leftWidth}%` }}
-          >
-            <CodeEditor
-              code={code}
-              setCode={setCode}
-              language={language}
-              setLanguage={setLanguage}
-              onSubmit={() => submitSolution(canExecute, recordAttempt, () => saveCodeToLocalStorage(currentProblem, code, language))}
-              isSubmitting={isSubmitting}
-              isProblemSolved={isProblemSolved}
-              canExecute={canExecute}
-              topHeight={topHeight}
-            />
-
-            <div 
-              className="h-1 bg-border hover:bg-primary cursor-row-resize flex items-center justify-center group"
-              onMouseDown={handleMouseDownVertical}
-            >
-              <div className="w-8 h-1 bg-muted-foreground group-hover:bg-primary rounded"></div>
-            </div>
-
-            <OutputPanel
-              output={output}
-              isSubmitting={isSubmitting}
-              isProblemSolved={isProblemSolved}
-              topHeight={topHeight}
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm text-gray-400">
+            <span>
+              Question {currentIndex + 1} of {questions.length}
+            </span>
+            <span>{answeredCount} answered</span>
+          </div>
+          <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-orange-500"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.3 }}
             />
           </div>
         </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="bg-[#120c0c] border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl"
+          >
+            <h2 className="text-xl sm:text-2xl font-semibold leading-relaxed">
+              {currentQuestion.question}
+            </h2>
+
+            <div className="space-y-3">
+              {currentQuestion.options.map((option, idx) => {
+                const isSelected = answers[currentIndex] === idx;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleAnswer(idx)}
+                    className={`w-full p-4 rounded-xl text-left transition-all border-2 flex items-center gap-3 ${
+                      isSelected
+                        ? "bg-orange-500/10 border-orange-500 text-white"
+                        : "bg-[#1a1313] border-gray-800 text-gray-300 hover:bg-[#221818] hover:border-gray-600"
+                    }`}
+                  >
+                    <span
+                      className={`flex items-center justify-center w-8 h-8 rounded-lg font-semibold ${
+                        isSelected
+                          ? "bg-orange-500 text-white"
+                          : "bg-gray-800 text-gray-400"
+                      }`}
+                    >
+                      {String.fromCharCode(65 + idx)}
+                    </span>
+                    <span className="flex-1">{option}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="flex items-center justify-between gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
+            disabled={currentIndex === 0}
+            className="border-gray-700 bg-[#1a1313] text-gray-300 hover:bg-[#221818]"
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Previous
+          </Button>
+
+          <div className="hidden sm:flex gap-1.5">
+            {questions.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  idx === currentIndex
+                    ? "bg-orange-500 w-6"
+                    : answers[idx] !== undefined
+                    ? "bg-green-500"
+                    : "bg-gray-700"
+                }`}
+              />
+            ))}
+          </div>
+
+          {currentIndex === questions.length - 1 ? (
+            <Button
+              onClick={() => handleSubmit(false)}
+              className="bg-gradient-to-r from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white"
+            >
+              Submit
+              <Send className="h-4 w-4 ml-1" />
+            </Button>
+          ) : (
+            <Button
+              onClick={() =>
+                setCurrentIndex((i) =>
+                  Math.min(questions.length - 1, i + 1)
+                )
+              }
+              className="bg-gradient-to-r from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white"
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          )}
+        </div>
+
+        {answeredCount === questions.length &&
+          currentIndex !== questions.length - 1 && (
+            <Button
+              onClick={() => handleSubmit(false)}
+              variant="outline"
+              className="w-full border-green-500/30 text-green-400 hover:bg-green-500/10"
+            >
+              All questions answered — Submit now
+            </Button>
+          )}
       </div>
     </div>
   );
 };
 
-export default Contest;
+export default Round1Contest;

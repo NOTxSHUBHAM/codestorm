@@ -187,11 +187,10 @@ const Carousel = React.memo(function Carousel({ cards, rotation }) {
           transform,
           width: carouselConfig.cylinderWidth,
           transformStyle: "preserve-3d",
-          pointerEvents: "auto",
+          // FIX 1: Let clicks pass through the container
+          pointerEvents: "none", 
           touchAction: isScreenSizeSm ? "" : "pan-x",
           willChange: "transform",
-          backfaceVisibility: "hidden",
-          WebkitBackfaceVisibility: "hidden",
         }}
       >
         {cards.map((member, i) => (
@@ -203,7 +202,10 @@ const Carousel = React.memo(function Carousel({ cards, rotation }) {
               transform: `rotateY(${
                 i * carouselConfig.angleStep
               }deg) translateZ(${carouselConfig.radius}px)`,
+              // FIX 2: Re-enable clicks for the individual cards
               pointerEvents: "auto",
+              // FIX 3: Prevents the 3D bounding box from overlapping other cards
+              transformStyle: "flat", 
             }}
           >
             <MemberCard member={member} />
@@ -226,7 +228,6 @@ const ThreeDPhotoCarousel = forwardRef(function ThreeDPhotoCarousel(
   const isScreenSizeSm = useMediaQuery("(max-width: 640px)");
   const angleStep = 360 / teamMembers.length;
 
-  // Expose navigate for scroll
   useImperativeHandle(
     ref,
     () => ({
