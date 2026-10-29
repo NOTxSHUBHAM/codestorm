@@ -37,14 +37,11 @@ const Navbar = () => {
           className="group flex items-center gap-3"
           aria-label="CodeStorm home"
         >
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary p-1.5 transition-transform group-hover:rotate-[-6deg]">
+          <span className="grid h-12 w-12 place-items-center bg-transparent transition-transform group-hover:rotate-[-6deg]">
             <img src="/logo.png" alt="" className="h-full w-full object-contain" />
           </span>
-          <span className="text-left text-lg font-extrabold tracking-tight text-foreground">
+          <span className="text-left text-xl font-extrabold tracking-tight text-foreground">
             Code<span className="text-primary">Storm</span>
-            <span className="ml-2 hidden text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground sm:inline">
-              CRCE
-            </span>
           </span>
         </button>
 
