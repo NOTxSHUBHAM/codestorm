@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-export default function Terminal() {
+export default function Terminal({ autoFocus = true }) {
   const [lines, setLines] = useState([
     { type: "output", content: "Welcome to CodeStorm Terminal v1.0.0" },
     { type: "output", content: "Type 'codestorm --help' to get started." },
@@ -158,10 +158,10 @@ export default function Terminal() {
   }, [lines]);
 
   useEffect(() => {
-    if (inputRef.current) {
+    if (autoFocus && inputRef.current) {
       inputRef.current.focus();
     }
-  }, []);
+  }, [autoFocus]);
 
   const quickHints = ["help", "codestorm --help", "whoami", "date", "clear"];
 

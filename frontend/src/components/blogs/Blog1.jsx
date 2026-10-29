@@ -80,7 +80,7 @@ const Blog1 = () => {
   }, []);
 
   return (
-    <GridBackground className="min-h-screen bg-background dark:bg-background">
+    <GridBackground className="codestorm-page min-h-screen">
       {/* Reading progress bar */}
       <motion.div
         style={{ scaleX: progress }}
@@ -99,13 +99,13 @@ const Blog1 = () => {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative max-w-4xl mx-auto bg-card/70 backdrop-blur-xl border border-border/60 rounded-3xl overflow-hidden shadow-2xl"
+          className="surface-card relative mx-auto max-w-4xl overflow-hidden backdrop-blur-xl"
         >
           {/* top sheen */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
 
           {/* ---------- Blog Header ---------- */}
-          <div className="relative p-6 sm:p-8 md:p-10 border-b border-border/50">
+          <div className="relative border-b border-border/50 p-6 sm:p-8 md:p-12">
             {/* Back button */}
             <motion.div
               className="mb-5"
@@ -116,7 +116,7 @@ const Blog1 = () => {
               <Button
                 variant="secondary"
                 onClick={() => navigate("/blogs")}
-                className="group rounded-full h-9 px-3 text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+                className="group h-9 rounded-full border-border/70 px-4 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground"
               >
                 <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
                 <span className="ml-1 text-xs font-medium">All blogs</span>
@@ -124,7 +124,8 @@ const Blog1 = () => {
             </motion.div>
 
             {/* Badges */}
-            <div className="flex flex-wrap items-center gap-2 mb-5">
+            <p className="page-eyebrow mb-4">Learning path · 10 minute read</p>
+            <div className="mb-5 flex flex-wrap items-center gap-2">
               <Badge
                 variant="secondary"
                 className="text-xs font-medium bg-primary/15 text-primary border border-primary/30 hover:bg-primary/20"
@@ -141,10 +142,10 @@ const Blog1 = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground mb-6 leading-[1.1] tracking-tight"
+              className="mb-6 text-4xl font-extrabold leading-[1.04] tracking-tight text-foreground sm:text-5xl md:text-6xl"
             >
               The Complete Guide to Getting Started with{" "}
-              <span className="bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary via-orange-300 to-primary/80 bg-clip-text text-transparent">
                 Data Structures &amp; Algorithms
               </span>
             </motion.h1>

@@ -262,7 +262,7 @@ const handleAddUser = async ({ username, branch }) => {
 
   if (loading) {
     return (
-      <GridBackground className="min-h-screen" maskIntensity="0.1%">
+      <GridBackground className="codestorm-page min-h-screen" maskIntensity="0.1%">
         <div className="min-h-screen flex items-center justify-center px-4">
           <div className="text-center">
             <div className="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
@@ -274,9 +274,9 @@ const handleAddUser = async ({ username, branch }) => {
   }
 
   return (
-    <GridBackground className="min-h-screen" maskIntensity="0.1%">
+    <GridBackground className="codestorm-page min-h-screen" maskIntensity="0.1%">
       <div className="relative z-10 min-h-screen flex flex-col">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12 max-w-4xl text-foreground flex-1">
+        <div className="container mx-auto flex-1 px-4 py-8 text-foreground sm:px-6 sm:py-12 lg:px-8">
           {/* Back Button */}
           <motion.div
             className="mb-4"
@@ -285,42 +285,45 @@ const handleAddUser = async ({ username, branch }) => {
             transition={{ duration: 0.4 }}
           >
             <Button
-              variant="secondary"
+              variant="outline"
               onClick={() => navigate("/")}
-              className="text-muted-foreground hover:text-foreground -ml-2"
+              className="rounded-full border-border/70 text-muted-foreground hover:border-primary/50 hover:text-foreground"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back home
             </Button>
           </motion.div>
 
           {/* Header */}
           <motion.div
-            className="text-center space-y-3 sm:space-y-4 mb-6 sm:mb-8"
+            className="mx-auto mb-10 max-w-4xl space-y-4 border-b border-border/60 pb-8 text-center sm:mb-12 sm:pb-10"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground dark:text-foreground leading-tight">
+            <p className="page-eyebrow">The numbers behind the grind</p>
+            <h1 className="text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               CRCE's{" "}
               <span className="bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent">
                 LeetCode
               </span>{" "}
-              Leaderboard
+              leaderboard
             </h1>
-            <p className="text-base sm:text-lg text-muted-foreground dark:text-muted-foreground max-w-2xl mx-auto leading-relaxed px-4">
-              The snakes who might be grinding next to you 🐍
+            <p className="mx-auto max-w-2xl px-4 text-base leading-7 text-muted-foreground sm:text-lg">
+              A little friendly competition goes a long way. Find your cohort,
+              track the streak, and keep solving.
             </p>
           </motion.div>
 
           {/* Controls Row */}
           <motion.div
-            className="space-y-4 mb-6 sm:mb-8"
+            className="surface-card mb-8 space-y-5 p-4 sm:mb-10 sm:p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             {/* Sort and Search */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+            <div             className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
               {/* Sort Filter */}
               <div className="flex items-center gap-2 flex-shrink-0">
                 <Filter className="w-4 h-4 text-muted-foreground hidden sm:block" />
@@ -328,7 +331,7 @@ const handleAddUser = async ({ username, branch }) => {
                   Sort by:
                 </Label>
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-full sm:w-48">
+                  <SelectTrigger                   className="w-full border-border/70 bg-background/70 sm:w-52">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -352,7 +355,7 @@ const handleAddUser = async ({ username, branch }) => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search users..."
-                    className="pl-10 text-foreground"
+                    className="rounded-xl border-border/70 bg-background/70 pl-10 text-foreground"
                   />
                 </div>
               </div>
@@ -373,7 +376,7 @@ const handleAddUser = async ({ username, branch }) => {
                       setSelectedYear(selectedYear === year ? "" : year);
                       setSelectedBranch(""); 
                     }}
-                    className="rounded-full px-4 py-1 h-8"
+                    className="h-9 rounded-full border-border/70 px-4 py-1"
                   >
                     {year}
                   </Button>
@@ -382,7 +385,7 @@ const handleAddUser = async ({ username, branch }) => {
               <div className="w-full sm:w-auto sm:ml-auto mt-2 sm:mt-0">
                 <Button
                   onClick={() => setIsAddUserModalOpen(true)}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                  className="rounded-full bg-primary px-5 text-primary-foreground shadow-lg shadow-primary/15 hover:bg-primary/90"
                   size="sm"
                 >
                   <Plus className="w-4 h-4 mr-2" />
@@ -437,11 +440,11 @@ const handleAddUser = async ({ username, branch }) => {
                         className="group"
                       >
                         <Card
-                          className={`overflow-hidden transition-all duration-300 hover:shadow-lg ${
+                          className={`overflow-hidden rounded-2xl border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl ${
                             currentRank <= 3
-                              ? "bg-gradient-to-r from-card/90 to-card/70 border-primary/50"
-                              : "bg-card/80 hover:bg-card/90"
-                          } backdrop-blur-md border-border hover:border-primary/30`}
+                              ? "border-primary/35 bg-gradient-to-r from-primary/[0.08] to-card/90"
+                              : "border-border/70 bg-card/80 hover:border-primary/30 hover:bg-card/90"
+                          } backdrop-blur-md`}
                         >
                           <CardContent className="p-4 sm:p-6">
                             <div className="flex items-center gap-3 sm:gap-4 lg:gap-6">

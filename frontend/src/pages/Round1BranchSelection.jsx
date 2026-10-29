@@ -38,14 +38,6 @@ const Round1Contest = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const selectedBranch = localStorage.getItem("selectedBranch");
 
-  // Redirect if no branch selected
-  useEffect(() => {
-    if (!selectedBranch) {
-      toast.error("All the best!");
-      navigate("/round-1/branch-selection");
-    }
-  }, [selectedBranch, navigate]);
-
   // Timer
   useEffect(() => {
     if (isSubmitted) return;
@@ -231,8 +223,10 @@ const Round1Contest = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Round 1 Quiz</h1>
-            <p className="text-sm text-gray-400 mt-1">{selectedBranch}</p>
+            <h1 className="text-2xl font-bold tracking-tight">CodeStorm Quiz</h1>
+            {selectedBranch && (
+              <p className="mt-1 text-sm text-gray-400">{selectedBranch}</p>
+            )}
           </div>
           <div
             className={`flex items-center gap-2 px-4 py-2 rounded-xl font-mono text-lg border ${

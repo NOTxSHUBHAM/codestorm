@@ -64,20 +64,13 @@ const MemberCard = React.memo(function MemberCard({ member }) {
       <div className="pointer-events-none absolute -inset-6 rounded-3xl bg-primary/0 blur-3xl transition-all duration-500 group-hover:bg-primary/25" />
 
       <Card
-        className="relative w-full h-[380px] overflow-hidden rounded-2xl
-                   border border-border/60 bg-card/70 backdrop-blur-xl
-                   shadow-2xl shadow-black/20
-                   transition-transform duration-500 will-change-transform
-                   group-hover:-translate-y-1"
+        className="relative h-[380px] w-full overflow-hidden rounded-[1.4rem] border border-white/10 bg-[#181512] shadow-2xl shadow-black/30 transition-transform duration-500 will-change-transform group-hover:-translate-y-1"
       >
-        {/* top sheen */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-
-        <div className="relative w-full h-[210px] overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
           <img
             src={member.image}
             alt={member.name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             style={{
               pointerEvents: "none",
               transform: "translateZ(0)",
@@ -85,35 +78,34 @@ const MemberCard = React.memo(function MemberCard({ member }) {
               WebkitBackfaceVisibility: "hidden",
             }}
           />
-          {/* vignette */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
         </div>
 
-        <CardContent className="relative -mt-10 pb-5 px-6 flex flex-col flex-1 justify-between">
-          <div className="text-center space-y-1">
-            <h3 className="text-lg font-semibold text-card-foreground leading-tight tracking-tight">
+        <CardContent className="absolute inset-x-0 bottom-0 flex flex-col justify-end px-6 pb-6">
+          <div className="space-y-1 text-left">
+            <h3 className="text-xl font-bold leading-tight tracking-tight text-white">
               {member.name}
             </h3>
-            <p className="text-sm text-primary/80 font-medium">
+            <p className="text-sm font-semibold text-primary">
               {member.role}
             </p>
             {member.subdivision && (
-              <p className="text-[11px] uppercase tracking-widest text-muted-foreground/80">
+              <p className="text-[11px] uppercase tracking-widest text-white/60">
                 {member.subdivision}
               </p>
             )}
           </div>
 
-          <div className="flex gap-3 justify-center mt-5">
+          <div className="mt-4 flex gap-2">
             {member.instagram && (
               <a
                 href={member.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group/btn relative inline-flex items-center justify-center p-2.5 rounded-full
-                           bg-secondary/80 text-secondary-foreground
-                           hover:bg-gradient-to-br hover:from-pink-500 hover:to-purple-500 hover:text-white
-                           transition-all duration-200 hover:scale-110 hover:shadow-lg hover:shadow-pink-500/25"
+                           bg-white/10 text-white backdrop-blur
+                           hover:bg-primary hover:text-primary-foreground
+                           transition-all duration-200 hover:scale-110 hover:shadow-lg hover:shadow-primary/25"
                 onClick={(e) => e.stopPropagation()}
                 aria-label={`${member.name}'s Instagram`}
               >
@@ -126,9 +118,9 @@ const MemberCard = React.memo(function MemberCard({ member }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group/btn relative inline-flex items-center justify-center p-2.5 rounded-full
-                           bg-secondary/80 text-secondary-foreground
-                           hover:bg-gradient-to-br hover:from-blue-500 hover:to-cyan-500 hover:text-white
-                           transition-all duration-200 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/25"
+                           bg-white/10 text-white backdrop-blur
+                           hover:bg-primary hover:text-primary-foreground
+                           transition-all duration-200 hover:scale-110 hover:shadow-lg hover:shadow-primary/25"
                 onClick={(e) => e.stopPropagation()}
                 aria-label={`${member.name}'s LinkedIn`}
               >
@@ -422,6 +414,33 @@ const teamMembers = [
   },
   {
     id: 9,
+    name: "Aditya Dabreo",
+    role: "",
+    subdivision: "TE COMPS C",
+    image: "/Aditya.jpg",
+    instagram: "https://www.instagram.com/aditya_dab/",
+    linkedin: "",
+  },
+  {
+    id: 10,
+    name: "Ankit Satpute",
+    role: "",
+    subdivision: "TE COMPS C",
+    image: "/Ankit.jpg",
+    instagram: "https://www.instagram.com/ankit_satputee/",
+    linkedin: "",
+  },
+  {
+    id: 11,
+    name: "latika Gupta",
+    role: "",
+    subdivision: "TE COMPS C",
+    image: "/latika.jpg",
+    instagram: "https://www.instagram.com/latika_2109/",
+    linkedin: "https://www.linkedin.com/in/latikagupta2109/",
+  },
+  {
+    id: 12,
     name: "CodeStorm Faculty",
     role: "Faculty Incharge",
     subdivision: "",
@@ -433,7 +452,7 @@ const teamMembers = [
 
 const juniorCouncilMembers = [
   {
-    id: 11,
+    id: 13,
     name: "Shubham Yadav",
     role: "Jr. Tech Head",
     subdivision: "SE comps C",
@@ -442,7 +461,7 @@ const juniorCouncilMembers = [
     linkedin: "https://www.linkedin.com/in/shubham-yadav243/",
   },
   {
-    id: 12,
+    id: 14,
     name: "Zehra Sayed",
     role: "Jr. Media Head",
     subdivision: "SE",
@@ -451,7 +470,7 @@ const juniorCouncilMembers = [
     linkedin: "https://www.linkedin.com/in/zehra-sayed-8b5a85441/",
   },
   {
-    id: 13,
+    id: 15,
     name: "Farhan Shaikh",
     role: "SE Representative",
     subdivision: "SE COMPS A",
@@ -460,7 +479,7 @@ const juniorCouncilMembers = [
     linkedin: "https://www.linkedin.com/in/farhan-shaikh-82810637a?utm_source=share_via&utm_content=profile&utm_medium=member_android/",
   },
   {
-    id: 14,
+    id: 16,
     name: "Harishankar Chaudhary",
     role: "Jr Documentation Head",
     subdivision: "SE",
@@ -469,7 +488,7 @@ const juniorCouncilMembers = [
     linkedin: "https://www.linkedin.com/in/harishankar-chaudhary/",
   },
   {
-    id: 15,
+    id: 17,
     name: "Iris Renoy",
     role: "Jr. Design Head",
     subdivision: "SE",
@@ -478,7 +497,7 @@ const juniorCouncilMembers = [
     linkedin: "https://www.linkedin.com/in/iris-renoy-7b2340423/",
   },
   {
-    id: 16,
+    id: 18,
     name: "Pushkar Jaiswal",
     role: "Jr. PR Head",
     subdivision: "SE CSE A",
@@ -487,7 +506,7 @@ const juniorCouncilMembers = [
     linkedin: "https://www.linkedin.com/in/pushkar-jaiswal-b276bb373/",
   },
   {
-    id: 17,
+    id: 19,
     name: "Trinav Sircar",
     role: "Jr. Event Head",
     subdivision: "SE CSE C",
@@ -503,26 +522,25 @@ const juniorCouncilMembers = [
 
 const SectionHeader = ({ badge, title, subtitle, delay = 0 }) => (
   <motion.div
-    className="text-center mb-8"
+    className="mb-8 text-left"
     initial={{ opacity: 0, y: 24 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.6, delay }}
   >
     {badge && (
-      <span className="inline-block mb-4 px-3 py-1 text-xs font-semibold tracking-widest uppercase rounded-full border border-primary/40 bg-primary/10 text-primary">
+      <span className="page-eyebrow mb-4 inline-block rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5">
         {badge}
       </span>
     )}
-    <h2 className="text-4xl md:text-5xl font-extrabold mb-3 bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent">
+    <h2 className="mb-3 text-4xl font-black tracking-tight text-foreground sm:text-5xl">
       {title}
     </h2>
     {subtitle && (
-      <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+      <p className="max-w-xl text-sm leading-6 text-muted-foreground">
         {subtitle}
       </p>
     )}
-    <span className="mt-5 inline-block h-px w-32 bg-gradient-to-r from-transparent via-primary to-transparent" />
   </motion.div>
 );
 
@@ -537,7 +555,7 @@ const TeamSection = () => {
   return (
     <section
       id="team-section"
-      className="relative py-20 px-4 overflow-hidden"
+      className="relative overflow-hidden px-5 py-20 sm:px-8 sm:py-28 lg:px-12"
     >
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/2 top-[10%] h-[450px] w-[700px] -translate-x-1/2 rounded-full bg-primary/15 blur-[140px]" />
@@ -545,7 +563,7 @@ const TeamSection = () => {
         <div className="absolute left-[5%] bottom-[10%] h-[280px] w-[280px] rounded-full bg-primary/10 blur-[110px]" />
       </div>
 
-      <div className="max-w-6xl mx-auto">
+      <div className="mx-auto max-w-7xl">
         <SectionHeader
           badge="Senior Council"
           title="Our Team"

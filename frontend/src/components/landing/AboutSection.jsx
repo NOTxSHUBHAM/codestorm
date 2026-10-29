@@ -10,7 +10,7 @@ const AboutSection = () => {
   return (
     <div
       id="about-section"
-      className="relative text-foreground py-20 px-4 flex flex-col items-center pb-32 w-full overflow-hidden"
+      className="relative flex w-full flex-col items-center overflow-hidden px-5 py-24 pb-28 text-foreground sm:px-8 lg:px-10"
     >
       {/* Background glow */}
       <div className="pointer-events-none absolute inset-0 -z-10">
@@ -20,65 +20,84 @@ const AboutSection = () => {
 
       {/* Header */}
       <motion.div
-        className="w-full max-w-4xl text-center mb-14"
+        className="mb-10 w-full max-w-6xl text-left"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
       >
-        <span className="inline-block mb-4 px-3 py-1 text-xs font-semibold tracking-widest uppercase rounded-full border border-primary/40 bg-primary/10 text-primary">
+        <span className="page-eyebrow inline-block mb-4 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5">
           Who we are
         </span>
-        <h2 className="text-5xl md:text-6xl font-extrabold mb-5 bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent">
-          CodeStorm.
+        <h2 className="mb-5 max-w-3xl text-4xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-5xl md:text-6xl">
+          Think in code.{" "}
+          <span className="bg-gradient-to-r from-primary to-orange-300 bg-clip-text text-transparent">
+            Grow together.
+          </span>
         </h2>
-        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
           DSA isn't a hurdle. It's a playground for problem solvers.
         </p>
       </motion.div>
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
-        {[
-          {
-            label: "Who?",
-            text: "A crew of builders, thinkers, and doers—here to change the vibe.",
-          },
-          {
-            label: "Why?",
-            text: "Because problem solving should be exciting, not intimidating.",
-          },
-          {
-            label: "What?",
-            text: "We make DSA and tech fun—through events, challenges, and community.",
-          },
-        ].map((card, i) => (
-          <motion.div
-            key={card.label}
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: i * 0.1 }}
-            className="group relative bg-card/70 backdrop-blur-sm border border-border/60 rounded-2xl flex flex-col h-full p-6 shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:border-primary/50 transition-all duration-300 overflow-hidden"
-          >
-            {/* glow on hover */}
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-              <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
-            </div>
+      <div className="grid w-full max-w-6xl gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16">
+        <div className="divide-y divide-border/70 border-y border-border/70">
+          {[
+            {
+              label: "A place to explore",
+              text: "A crew of builders, thinkers, and doers—here to make room for big questions and first attempts.",
+            },
+            {
+              label: "Learning without the pressure",
+              text: "Problem solving should be exciting, not intimidating. We turn concepts into things you can actually try.",
+            },
+            {
+              label: "Made for doing",
+              text: "Logic-driven events, workshops, and community sessions put DSA and technology into practice.",
+            },
+          ].map((item, index) => (
+            <motion.article
+              key={item.label}
+              initial={{ opacity: 0, x: -18 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: index * 0.08 }}
+              className="grid gap-3 py-6 sm:grid-cols-[4rem_1fr] sm:gap-5 sm:py-7"
+            >
+              <span className="font-mono text-sm text-primary">0{index + 1}</span>
+              <div>
+                <h3 className="text-xl font-bold tracking-tight text-foreground">{item.label}</h3>
+                <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">{item.text}</p>
+              </div>
+            </motion.article>
+          ))}
+        </div>
 
-            <span className="relative text-xl font-bold mb-3 text-primary">
-              {card.label}
-            </span>
-            <p className="relative text-lg text-card-foreground/90">
-              {card.text}
+        <motion.aside
+          initial={{ opacity: 0, scale: 0.97 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="relative flex min-h-72 flex-col justify-between overflow-hidden rounded-[1.75rem] bg-primary p-7 text-primary-foreground sm:p-9"
+        >
+          <span className="text-xs font-bold uppercase tracking-[0.18em]">Our point of view</span>
+          <div className="relative z-10">
+            <p className="text-3xl font-black leading-tight tracking-tight sm:text-4xl">
+              Not a checklist. A playground.
             </p>
-          </motion.div>
-        ))}
+            <p className="mt-4 max-w-sm text-sm leading-6 text-primary-foreground/80">
+              Build a way of thinking that sticks with you long after the problem is solved.
+            </p>
+          </div>
+          <span aria-hidden="true" className="absolute -bottom-16 -right-3 text-[15rem] font-black leading-none text-white/10">
+            {"{"}
+          </span>
+        </motion.aside>
       </div>
 
       {/* Dropdown */}
       <motion.div
-        className="mt-12 w-full flex justify-center"
+        className="mt-8 flex w-full max-w-6xl justify-start"
         initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -88,7 +107,7 @@ const AboutSection = () => {
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="group relative text-base font-semibold px-7 py-5 rounded-full border-primary/40 bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 transition-all duration-300"
+              className="group relative rounded-full border-primary/40 bg-primary/10 px-6 py-5 text-sm font-semibold transition-all duration-300 hover:bg-primary/15 sm:text-base"
             >
               More info for nerds
               <span className="ml-2 inline-block transition-transform duration-300 group-data-[state=open]:rotate-180">

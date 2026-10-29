@@ -29,7 +29,7 @@ export default function ContactSection() {
   };
 
   return (
-    <div className="relative w-full max-w-[90vw] sm:max-w-2xl md:max-w-4xl mx-auto mt-12 mb-40">
+    <div className="relative mx-auto mb-20 mt-12 w-full max-w-7xl px-5 sm:mb-28 sm:px-8 lg:px-12">
       {/* Soft gradient glow behind the card */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[600px] rounded-full bg-primary/20 blur-[120px]" />
@@ -38,33 +38,31 @@ export default function ContactSection() {
 
       <section
         id="contact-section"
-        className="relative rounded-3xl border border-border/60 bg-card/60 backdrop-blur-xl p-6 sm:p-8 md:p-10 shadow-2xl overflow-hidden"
+        className="relative grid overflow-hidden rounded-[2rem] border border-border/60 bg-card shadow-2xl lg:grid-cols-[0.85fr_1.15fr]"
       >
-        {/* subtle top highlight */}
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-
-        <div className="flex flex-col md:flex-row items-start justify-between gap-10">
-          {/* Left: message + socials */}
+        <div className="relative flex flex-col justify-between overflow-hidden bg-primary p-7 text-primary-foreground sm:p-10 lg:p-12">
+          <div className="pointer-events-none absolute -bottom-16 -right-10 text-[17rem] font-black leading-none text-white/10" aria-hidden="true">
+            @
+          </div>
           <motion.div
-            className="flex-1 flex flex-col justify-center text-left"
+            className="relative z-10"
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <span className="inline-block self-start mb-4 px-3 py-1 text-xs font-semibold tracking-widest uppercase rounded-full border border-primary/40 bg-primary/10 text-primary">
-              Contact
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold mb-4 bg-gradient-to-b from-foreground to-foreground/60 bg-clip-text text-transparent">
-              Get in Touch with CodeStorm
-            </h2>
-            <p className="text-muted-foreground text-base mb-8 max-w-sm">
-              Have an idea or want to collaborate?
+            <p className="mb-5 text-xs font-bold uppercase tracking-[0.2em] text-primary-foreground/75">A good place to start</p>
+            <h2 className="mb-5 text-4xl font-black leading-[1.02] tracking-tight sm:text-5xl">
+              Have a big
               <br />
-              Drop a message and we'll get back to you soon.
+              little idea?
+            </h2>
+            <p className="mb-8 max-w-sm text-sm leading-6 text-primary-foreground/80">
+              Collaborate with us, ask a question, or just say hello. The
+              CodeStorm door is open.
             </p>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               <SocialLink
                 href="https://www.linkedin.com/company/codestorm-crce/"
                 label="LinkedIn"
@@ -86,18 +84,37 @@ export default function ContactSection() {
             </div>
           </motion.div>
 
-          {/* Right: form */}
           <motion.div
-            className="flex-1 w-full"
+            className="relative z-10 mt-12"
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary-foreground/65">Or email us directly</p>
+            <a className="mt-2 inline-block text-sm font-bold transition hover:underline" href="mailto:codestorm.crce@gmail.com">
+              codestorm.crce@gmail.com
+            </a>
+          </motion.div>
+        </div>
+
+        <div className="p-7 sm:p-10 lg:p-12">
+          <div className="mb-8">
+            <p className="page-eyebrow">Drop us a line</p>
+            <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">Let&apos;s make something happen.</p>
+          </div>
+          <motion.div
+            className="w-full"
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.15 }}
           >
             <form
-              className="flex flex-col gap-3 w-full max-w-sm ml-auto"
+              className="flex w-full flex-col gap-4"
               onSubmit={handleSend}
             >
+              <label htmlFor="email" className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Your email</label>
               <Input
                 id="email"
                 type="email"
@@ -105,8 +122,9 @@ export default function ContactSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-background/70 border-border/60 focus-visible:ring-primary/50 rounded-xl h-11"
+                className="h-12 rounded-xl border-border/70 bg-background/70 px-4 focus-visible:ring-primary/50"
               />
+              <label htmlFor="message" className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">What&apos;s on your mind?</label>
               <Textarea
                 id="message"
                 placeholder="Your message"
@@ -114,11 +132,11 @@ export default function ContactSection() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 required
-                className="bg-background/70 border-border/60 focus-visible:ring-primary/50 rounded-xl resize-none"
+                className="resize-none rounded-xl border-border/70 bg-background/70 px-4 py-3 focus-visible:ring-primary/50"
               />
               <motion.button
                 type="submit"
-                className="relative overflow-hidden bg-gradient-to-r from-primary to-accent text-white rounded-xl px-4 py-3 font-semibold mt-1 text-sm shadow-lg shadow-primary/20 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                className="relative mt-1 inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-primary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60 sm:self-start"
                 whileTap={{ scale: 0.97 }}
                 whileHover={{ scale: 1.02 }}
                 disabled={status === "loading"}
@@ -149,9 +167,6 @@ export default function ContactSection() {
               </AnimatePresence>
             </form>
 
-            <span className="block text-xs text-muted-foreground mt-4 text-right">
-              codestorm.crce@gmail.com
-            </span>
           </motion.div>
         </div>
       </section>

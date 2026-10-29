@@ -32,6 +32,7 @@ const App = () => {
 
         {/* Round 1 Contest Routes */}
         <Route path="/round-1" element={<ContestRules />} />
+        <Route path="/quiz" element={<Round1BranchSelection />} />
         <Route path="/round-1/branch-selection" element={<Round1BranchSelection />} />
         <Route path="/round-1/contest" element={<Round1Contest />} />
         <Route path="/round-1/admin" element={<Round1Admin />} />
